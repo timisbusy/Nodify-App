@@ -10,6 +10,7 @@ var nodify = require('nodify-shopify');
  
 var apiKey, secret; 
 var persistentKeys= {};
+var scope = {orders: "read", products: "read"};
 
 //If Heroku or Foreman
  if(process.env.SHOPIFY_API_KEY != undefined && process.env.SHOPIFY_SECRET != undefined){
@@ -20,7 +21,9 @@ else {
 	var config = require ('./config.json');
 	apiKey = config.apiKey;
  	secret = config.secret;
+  scope = config.scope || scope;
 }
+
 
 // Configuration
 
@@ -116,7 +119,7 @@ function authenticate(req, res) {
 	if(shop !== undefined && shop !== null) {	
 	  console.log('creating a session for', shop, apiKey, secret)
 		session = nodify.createSession(shop, apiKey, secret, {
-	    scope: {orders: "read", products: "read"},
+	    scope: scope,
 	    uriForTemporaryToken: "http://"+req.headers.host+"/login/finalize/token",
 	    onAskToken: function onToken (err, url) {
 	    	res.redirect(url);
